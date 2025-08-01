@@ -6,115 +6,194 @@
 <title>KI-Wasserzeichen Detektor</title>
 <style>
 body {
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  font-family:Arial,sans-serif;
-  background:#f5f5f5;
-  padding:2rem;
-  text-align:center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  padding: 2rem;
+  text-align: center;
 }
 h1 {
-  margin-bottom:0.5rem;
-  text-align:center;
+  margin-bottom: 0.5rem;
+  text-align: center;
 }
 #inputWrapper, #inputText, #result {
-  width:98%;
-  max-width:900px;
-  margin-left:auto;
-  margin-right:auto;
-  box-sizing:border-box;
+  width: 98%;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
 }
 #inputWrapper {
-  position:relative;
-  margin:2rem auto 1rem auto;
-  display:flex;
-  justify-content:center;
+  position: relative;
+  margin: 2rem auto 1rem auto;
+  display: flex;
+  justify-content: center;
 }
 #inputText {
-  border:1px solid #ccc;
-  border-radius:8px;
-  padding:1rem;
-  font-size:1rem;
-  height:250px;
-  overflow:auto;
-  white-space:pre-wrap;
-  background:#fff;
-  text-align:left;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 1rem;
+  height: 250px;
+  overflow: auto;
+  white-space: pre-wrap;
+  background: #fff;
+  text-align: left;
 }
 #inputText.empty:before {
-  content:attr(data-placeholder);
-  color:#999;
-  pointer-events:none;
+  content: attr(data-placeholder);
+  color: #999;
+  pointer-events: none;
 }
 #inputText:focus {
-  outline:none;
-  border-color:#4CAF50;
+  outline: none;
+  border-color: #4CAF50;
 }
 #inputText span.invisible {
-  background:red;
-  color:#fff;
+  background: red;
+  color: white;
 }
 #inputText span.typical {
-  background:orange;
-  color:#fff;
+  background: orange;
+  color: white;
 }
 button {
-  padding:0.75rem 1.5rem;
-  margin:0.5rem;
-  font-size:1rem;
-  cursor:pointer;
-  border:none;
-  border-radius:5px;
+  padding: 0.75rem 1.5rem;
+  margin: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
 }
 .process-btn {
-  background:#2196F3;
-  color:#fff;
+  background: #2196F3;
+  color: white;
 }
 .process-btn:hover {
-  background:#1976D2;
+  background: #1976D2;
 }
 .copy-btn {
-  background:#FF9800;
-  color:#fff;
-  display:none;
+  background: #FF9800;
+  color: white;
+  display: none;
 }
 .copy-btn:hover {
-  background:#F57C00;
+  background: #F57C00;
 }
 .clear-btn {
-  background:#9e9e9e;
-  color:#fff;
-  margin-bottom:1rem;
-  display:inline-block;
+  background: #9e9e9e;
+  color: white;
+  margin-bottom: 1rem;
+  display: inline-block;
 }
 .clear-btn:hover {
-  background:#757575;
+  background: #757575;
 }
 .result {
-  display:none;
-  margin-top:1rem;
-  padding:1rem;
-  background:#f9f9f9;
-  border:1px solid #ccc;
-  text-align:left;
-  border-radius:6px;
+  display: none;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  text-align: left;
+  border-radius: 6px;
 }
-.char-section{margin-bottom:1rem;}
-.section-title{font-weight:bold;margin-bottom:0.5rem;}
-.char-list{background:white;padding:0.5rem;border:1px solid #ddd;border-radius:4px;max-height:150px;overflow-y:auto;}
-.char-item{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid #eee;font-size:0.9rem;}
-.char-item:last-child{border-bottom:none;}
-.char-code{color:#666;font-family:monospace;margin:0 10px;}
-.char-count{background:#FF5722;color:white;padding:2px 6px;border-radius:10px;font-size:0.8rem;}
-.action-section{text-align:center;margin-top:1rem;display:flex;justify-content:center;}
-.success-msg{color:#4CAF50;font-weight:bold;margin-top:1rem;display:none;}
-.info-section{margin-top:2rem;padding-top:1rem;border-top:1px solid #ddd;text-align:left;width:98%;max-width:900px;}
-.info-box{background:#f8f9fa;padding:1rem;border-radius:4px;margin-bottom:1rem;}
-.info-box h3{margin-bottom:0.5rem;}
-.info-box ul{list-style:none;padding-left:1rem;}
-.info-box li{color:#333;font-size:0.9rem;margin-bottom:0.3rem;}
-.info-box li:before{content:"\2713 ";color:#4CAF50;font-weight:bold;margin-right:5px;}
+.char-section {
+  margin-bottom: 1rem;
+}
+.section-title {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.char-list {
+  background: white;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+.char-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+.char-item:last-child {
+  border-bottom: none;
+}
+.char-code {
+  color: #666;
+  font-family: monospace;
+  margin: 0 10px;
+}
+.char-count {
+  background: #FF5722;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+.action-section {
+  text-align: center;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+.success-msg {
+  color: #4CAF50;
+  font-weight: bold;
+  margin-top: 1rem;
+  display: none;
+}
+.info-section {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+  text-align: left;
+  width: 98%;
+  max-width: 900px;
+}
+.info-box {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+.info-box h3 {
+  margin-bottom: 0.5rem;
+}
+.info-box ul {
+  list-style: none;
+  padding-left: 1rem;
+}
+.info-box li {
+  color: #333;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+.info-box li:before {
+  content: "\2713 ";
+  color: #4CAF50;
+  font-weight: bold;
+  margin-right: 5px;
+}
+footer {
+  margin-top: 2rem;
+  text-align: center;
+}
+footer a {
+  margin: 0.5rem;
+  color: #2196F3;
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
+}
 </style>
 </head>
 <body>
@@ -149,7 +228,7 @@ button {
 </footer>
 
 <script>
-const invisibleChars = { ' ': { name: 'Narrow No-Break Space' }, '\u200B': { name: 'Zero Width Space' }, '\u2060': { name: 'Word Joiner' }, '\u00A0': { name: 'Non-Breaking Space' }, '\u200C': { name: 'Zero Width Non-Joiner' }, '\u200D': { name: 'Zero Width Joiner' }, '\u200E': { name: 'Left-to-Right Mark' }, '\u200F': { name: 'Right-to-Left Mark' }, '\u202A': { name: 'Left-to-Right Embedding' }, '\u202B': { name: 'Right-to-Left Embedding' }, '\u202C': { name: 'Pop Directional Formatting' }, '\u202D': { n...
+const invisibleChars = { ' ': { name: 'Narrow No-Break Space' }, '\u200B': { name: 'Zero Width Space' }, '\u2060': { name: 'Word Joiner' }, '\u00A0': { name: 'Non-Breaking Space' }, '\u200C': { name: 'Zero Width Non-Joiner' }, '\u200D': { name: 'Zero Width Joiner' }, '\u200E': { name: 'Left-to-Right Mark' }, '\u200F': { name: 'Right-to-Left Mark' }, '\u202A': { name: 'Left-to-Right Embedding' }, '\u202B': { name: 'Right-to-Left Embedding' }, '\u202C': { name: 'Pop Directional Formatting' }, '\u202D': { name: 'Left-to-Right Override' }, '\u202E': { name: 'Right-to-Left Override' }, '\u180E': { name: 'Mongolian Vowel Separator' }, '\u00AD': { name: 'Soft Hyphen' } };
 const aiTypicalChars = { '–': { name: 'En Dash', replace: '-' }, '—': { name: 'Em Dash', replace: '-' }, '“': { name: 'Left Double Quote', replace: '"' }, '”': { name: 'Right Double Quote', replace: '"' }, '‘': { name: 'Left Single Quote', replace: "'" }, '’': { name: 'Right Single Quote', replace: "'" } };
 let currentText = '', foundInvisible = {}, foundTypical = {}, analyzed = false;
 
