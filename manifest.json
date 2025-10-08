@@ -2,7 +2,8 @@
   "name": "KI-Wasserzeichen Detektor",
   "short_name": "KI-Detector",
   "description": "Detektor für KI-Wasserzeichen in Texten",
-  "start_url": "/",
+  "start_url": "/AI-Watermark-Detect/",
+  "scope": "/AI-Watermark-Detect/",
   "display": "standalone",
   "icons": [
     {
