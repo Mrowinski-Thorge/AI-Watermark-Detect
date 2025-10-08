@@ -201,10 +201,10 @@ footer a:hover {
 <div id="inputWrapper">
   <div id="inputText" class="empty" contenteditable="true" data-placeholder="Text hier einfügen und bereinigen lassen..."></div>
 </div>
-<button class="clear-btn" id="clearBtn" onclick="clearField()">Feld leeren</button><br>
-<button id="analyzeBtn" class="process-btn" onclick="analyzeText()">Text analysieren</button>
+<button class="clear-btn" id="clearBtn">Feld leeren</button><br>
+<button id="analyzeBtn" class="process-btn">Text analysieren</button>
 <div id="result" class="result"></div>
-<button id="copyBtn" class="copy-btn" onclick="copyCleanedText()">Bereinigten Text kopieren</button>
+<button id="copyBtn" class="copy-btn">Bereinigten Text kopieren</button>
 <div class="success-msg" id="successMsg"></div>
 <div class="info-section">
   <div class="info-box">
@@ -229,131 +229,225 @@ footer a:hover {
 </footer>
 
 <script>
-const invisibleChars = { ' ': { name: 'Narrow No-Break Space' }, '\u200B': { name: 'Zero Width Space' }, '\u2060': { name: 'Word Joiner' }, '\u00A0': { name: 'Non-Breaking Space' }, '\u200C': { name: 'Zero Width Non-Joiner' }, '\u200D': { name: 'Zero Width Joiner' }, '\uFEFF': { name: 'Zero Width No-Break Space' } };
-const aiTypicalChars = { '–': { name: 'En Dash', replace: '-' }, '—': { name: 'Em Dash', replace: '-' }, '"': { name: 'Left Double Quote', replace: '"' }, '"': { name: 'Right Double Quote', replace: '"' }, ''': { name: 'Left Single Quote', replace: "'" }, ''': { name: 'Right Single Quote', replace: "'" }, '…': { name: 'Ellipsis', replace: '...' } };
-let currentText = '', foundInvisible = {}, foundTypical = {}, analyzed = false;
+const invisibleChars = {
+  '\u202F': { name: 'Narrow No-Break Space' },
+  '\u200B': { name: 'Zero Width Space' },
+  '\u2060': { name: 'Word Joiner' },
+  '\u00A0': { name: 'Non-Breaking Space' },
+  '\u200C': { name: 'Zero Width Non-Joiner' },
+  '\u200D': { name: 'Zero Width Joiner' },
+  '\uFEFF': { name: 'Zero Width No-Break Space' }
+};
+
+const aiTypicalChars = {
+  '–': { name: 'En Dash', replace: '-' },
+  '—': { name: 'Em Dash', replace: '-' },
+  '"': { name: 'Left Double Quote', replace: '"' },
+  '"': { name: 'Right Double Quote', replace: '"' },
+  ''': { name: 'Left Single Quote', replace: "'" },
+  ''': { name: 'Right Single Quote', replace: "'" },
+  '…': { name: 'Ellipsis', replace: '...' }
+};
+
+let currentText = '';
+let foundInvisible = {};
+let foundTypical = {};
+let analyzed = false;
+
+const inputText = document.getElementById('inputText');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const clearBtn = document.getElementById('clearBtn');
+const copyBtn = document.getElementById('copyBtn');
+const resultDiv = document.getElementById('result');
+const successMsg = document.getElementById('successMsg');
 
 function highlightText() {
-  const el = document.getElementById('inputText');
-  const raw = el.innerText;
-  el.classList.toggle('empty', raw.length === 0);
+  const raw = inputText.innerText;
+  inputText.classList.toggle('empty', raw.length === 0);
+  
   if (!analyzed) return;
+  
   let html = '';
   for (let c of raw) {
     if (invisibleChars[c]) {
-      html += `<span class='invisible'>${c === ' ' ? '␣' : c}</span>`;
+      html += `<span class='invisible'>${c === '\u202F' ? '␣' : '•'}</span>`;
     } else if (aiTypicalChars[c]) {
       html += `<span class='typical'>${c}</span>`;
     } else {
       html += c;
     }
   }
-  el.innerHTML = html;
+  inputText.innerHTML = html;
 }
 
-document.getElementById('inputText').addEventListener('input', () => { highlightText(); });
+inputText.addEventListener('input', highlightText);
 
-function analyzeText() {
-  const input = document.getElementById('inputText').innerText;
-  if (!input) {
-    document.getElementById('successMsg').textContent = 'Bitte Text eingeben!';
-    document.getElementById('successMsg').style.display = 'block';
+analyzeBtn.addEventListener('click', function() {
+  const input = inputText.innerText;
+  
+  if (!input || input.trim() === '') {
+    successMsg.textContent = 'Bitte Text eingeben!';
+    successMsg.style.display = 'block';
+    successMsg.style.color = '#f44336';
+    setTimeout(() => {
+      successMsg.style.display = 'none';
+    }, 3000);
     return;
   }
-  document.getElementById('analyzeBtn').style.display = 'none';
+  
+  analyzeBtn.style.display = 'none';
   currentText = input;
   foundInvisible = {};
   foundTypical = {};
+  
   for (let c of input) {
-    if (invisibleChars[c]) { foundInvisible[c] = (foundInvisible[c] || 0) + 1; }
-    if (aiTypicalChars[c]) { foundTypical[c] = (foundTypical[c] || 0) + 1; }
+    if (invisibleChars[c]) {
+      foundInvisible[c] = (foundInvisible[c] || 0) + 1;
+    }
+    if (aiTypicalChars[c]) {
+      foundTypical[c] = (foundTypical[c] || 0) + 1;
+    }
   }
+  
   analyzed = true;
   highlightText();
   showResults();
-}
+});
 
 function showResults() {
-  let result = document.getElementById('result');
   let html = '';
   let hasInvisible = Object.keys(foundInvisible).length > 0;
   let hasTypical = Object.keys(foundTypical).length > 0;
+  
   if (!hasInvisible && !hasTypical) {
-    result.innerHTML = '<div style="text-align:center;color:#4CAF50;font-size:18px;padding:20px;">Keine verdächtigen Zeichen gefunden!</div>';
-    result.style.display = 'block';
+    resultDiv.innerHTML = '<div style="text-align:center;color:#4CAF50;font-size:18px;padding:20px;">Keine verdächtigen Zeichen gefunden!</div>';
+    resultDiv.style.display = 'block';
     return;
   }
+  
   if (hasInvisible) {
     html += '<div class="char-section"><div class="section-title">Gefundene unsichtbare Zeichen:</div><div class="char-list">';
     for (let c in foundInvisible) {
-      html += `<div class="char-item"><input type='checkbox' class='charCheck' value='${c}' checked><span>${invisibleChars[c].name}</span><span class="char-code">U+${c.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}</span><span class="char-count">${foundInvisible[c]}x</span></div>`;
+      const code = c.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
+      html += `<div class="char-item">
+        <input type='checkbox' class='charCheck' data-char='${code}' checked>
+        <span>${invisibleChars[c].name}</span>
+        <span class="char-code">U+${code}</span>
+        <span class="char-count">${foundInvisible[c]}x</span>
+      </div>`;
     }
     html += '</div></div>';
   }
+  
   if (hasTypical) {
     html += '<div class="char-section"><div class="section-title">Gefundene KI-typische Zeichen:</div><div class="char-list">';
     for (let c in foundTypical) {
-      html += `<div class="char-item"><input type='checkbox' class='charCheck' value='${c}' checked><span>${aiTypicalChars[c].name}</span><span class="char-code">→ ${aiTypicalChars[c].replace}</span><span class="char-count">${foundTypical[c]}x</span></div>`;
+      const code = c.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
+      html += `<div class="char-item">
+        <input type='checkbox' class='charCheck' data-char='${code}' checked>
+        <span>${aiTypicalChars[c].name}</span>
+        <span class="char-code">→ ${aiTypicalChars[c].replace}</span>
+        <span class="char-count">${foundTypical[c]}x</span>
+      </div>`;
     }
     html += '</div></div>';
   }
+  
   html += `<div class="action-section"><button class="process-btn" onclick="processText()">Text bereinigen</button></div>`;
-  result.innerHTML = html;
-  result.style.display = 'block';
+  resultDiv.innerHTML = html;
+  resultDiv.style.display = 'block';
 }
 
 function processText() {
   let cleaned = currentText;
   let rc = 0, nc = 0;
+  
   document.querySelectorAll('.charCheck').forEach(chk => {
     if (chk.checked) {
-      const char = chk.value;
+      const code = parseInt(chk.getAttribute('data-char'), 16);
+      const char = String.fromCharCode(code);
+      
       if (invisibleChars[char]) {
-        let count = (cleaned.match(new RegExp(char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+        const count = (cleaned.split(char).length - 1);
         rc += count;
-        cleaned = cleaned.replace(new RegExp(char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '');
+        cleaned = cleaned.split(char).join('');
       }
+      
       if (aiTypicalChars[char]) {
-        let count = (cleaned.match(new RegExp(char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+        const count = (cleaned.split(char).length - 1);
         nc += count;
-        cleaned = cleaned.replace(new RegExp(char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), aiTypicalChars[char].replace);
+        cleaned = cleaned.split(char).join(aiTypicalChars[char].replace);
       }
     }
   });
-  document.getElementById('inputText').innerText = cleaned;
+  
+  inputText.innerText = cleaned;
+  currentText = cleaned;
   highlightText();
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('copyBtn').style.display = 'inline-block';
-  document.getElementById('successMsg').textContent = `Text wurde bereinigt. ${rc > 0 ? rc + ' unsichtbare Zeichen entfernt. ' : ''}${nc > 0 ? nc + ' Zeichen normalisiert.' : ''}`;
-  document.getElementById('successMsg').style.display = 'block';
+  resultDiv.style.display = 'none';
+  copyBtn.style.display = 'inline-block';
+  successMsg.style.color = '#4CAF50';
+  successMsg.textContent = `Text wurde bereinigt. ${rc > 0 ? rc + ' unsichtbare Zeichen entfernt. ' : ''}${nc > 0 ? nc + ' Zeichen normalisiert.' : ''}`;
+  successMsg.style.display = 'block';
 }
 
-function copyCleanedText() {
-  const el = document.getElementById('inputText');
+copyBtn.addEventListener('click', function() {
+  const text = inputText.innerText;
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      successMsg.style.color = '#4CAF50';
+      successMsg.textContent = 'Text wurde kopiert!';
+      successMsg.style.display = 'block';
+      setTimeout(() => {
+        successMsg.style.display = 'none';
+      }, 2000);
+    }).catch(err => {
+      console.error('Fehler beim Kopieren:', err);
+      fallbackCopy();
+    });
+  } else {
+    fallbackCopy();
+  }
+});
+
+function fallbackCopy() {
   const selection = window.getSelection();
   const range = document.createRange();
-  range.selectNodeContents(el);
+  range.selectNodeContents(inputText);
   selection.removeAllRanges();
   selection.addRange(range);
+  
   try {
     document.execCommand('copy');
-    document.getElementById('successMsg').textContent = 'Text wurde kopiert.';
-    document.getElementById('successMsg').style.display = 'block';
+    successMsg.style.color = '#4CAF50';
+    successMsg.textContent = 'Text wurde kopiert!';
+    successMsg.style.display = 'block';
+    setTimeout(() => {
+      successMsg.style.display = 'none';
+    }, 2000);
   } catch (err) {
     console.error('Fehler beim Kopieren:', err);
+    successMsg.style.color = '#f44336';
+    successMsg.textContent = 'Kopieren fehlgeschlagen. Bitte manuell kopieren.';
+    successMsg.style.display = 'block';
   }
+  
   selection.removeAllRanges();
 }
 
-function clearField() {
-  document.getElementById('inputText').innerText = '';
-  highlightText();
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('copyBtn').style.display = 'none';
-  document.getElementById('successMsg').style.display = 'none';
-  document.getElementById('analyzeBtn').style.display = 'inline-block';
+clearBtn.addEventListener('click', function() {
+  inputText.innerText = '';
+  inputText.classList.add('empty');
+  resultDiv.style.display = 'none';
+  copyBtn.style.display = 'none';
+  successMsg.style.display = 'none';
+  analyzeBtn.style.display = 'inline-block';
   analyzed = false;
-}
+  currentText = '';
+  foundInvisible = {};
+  foundTypical = {};
+});
 </script>
 </body>
 </html>
