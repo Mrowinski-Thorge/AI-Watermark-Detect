@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" id="themeColor" content="#f5f5f5">
 <title>KI-Wasserzeichen Detektor</title>
 <link rel="icon" href="logo.png" type="image/png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -452,7 +453,7 @@ function clearField() {
   analyzed = false;
 }
 
-// Auto-detect system theme
+// Auto-detect system theme and update theme-color
 function updateTheme() {
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   if (prefersDark) {
@@ -460,6 +461,9 @@ function updateTheme() {
   } else {
     document.body.classList.remove('dark-mode');
   }
+  // Update theme-color for PWA
+  const meta = document.getElementById('themeColor');
+  meta.content = prefersDark ? '#121212' : '#f5f5f5';
 }
 
 // Listen for theme changes
