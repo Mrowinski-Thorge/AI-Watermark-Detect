@@ -223,13 +223,14 @@ footer a:hover {
 </div>
 
 <footer>
-  <a href="https://acodemy.dev/sites/impressum.html" target="_blank">Impressum</a>
-  <a href="https://acodemy.dev/sites/terms.html" target="_blank">Datenschutz & Nutzungsbedingungen</a>
+  <a href="impressum.html">Impressum</a>
+  <a href="datenschutz.html">Datenschutz</a>
+  <a href="nutzungsbedingungen.html">Nutzungsbedingungen</a>
 </footer>
 
 <script>
-const invisibleChars = { ' ': { name: 'Narrow No-Break Space' }, '\u200B': { name: 'Zero Width Space' }, '\u2060': { name: 'Word Joiner' }, '\u00A0': { name: 'Non-Breaking Space' }, '\u200C': { name: 'Zero Width Non-Joiner' }, '\u200D': { name: 'Zero Width Joiner' }, '\u200E': { name: 'Left-to-Right Mark' }, '\u200F': { name: 'Right-to-Left Mark' }, '\u202A': { name: 'Left-to-Right Embedding' }, '\u202B': { name: 'Right-to-Left Embedding' }, '\u202C': { name: 'Pop Directional Formatting' }, '\u202D': { name: 'Left-to-Right Override' }, '\u202E': { name: 'Right-to-Left Override' }, '\u180E': { name: 'Mongolian Vowel Separator' }, '\u00AD': { name: 'Soft Hyphen' } };
-const aiTypicalChars = { '–': { name: 'En Dash', replace: '-' }, '—': { name: 'Em Dash', replace: '-' }, '“': { name: 'Left Double Quote', replace: '"' }, '”': { name: 'Right Double Quote', replace: '"' }, '‘': { name: 'Left Single Quote', replace: "'" }, '’': { name: 'Right Single Quote', replace: "'" } };
+const invisibleChars = { ' ': { name: 'Narrow No-Break Space' }, '\u200B': { name: 'Zero Width Space' }, '\u2060': { name: 'Word Joiner' }, '\u00A0': { name: 'Non-Breaking Space' }, '\u200C': { name: 'Zero Width Non-Joiner' }, '\u200D': { name: 'Zero Width Joiner' }, '\uFEFF': { name: 'Zero Width No-Break Space' } };
+const aiTypicalChars = { '–': { name: 'En Dash', replace: '-' }, '—': { name: 'Em Dash', replace: '-' }, '"': { name: 'Left Double Quote', replace: '"' }, '"': { name: 'Right Double Quote', replace: '"' }, ''': { name: 'Left Single Quote', replace: "'" }, ''': { name: 'Right Single Quote', replace: "'" }, '…': { name: 'Ellipsis', replace: '...' } };
 let currentText = '', foundInvisible = {}, foundTypical = {}, analyzed = false;
 
 function highlightText() {
@@ -285,7 +286,7 @@ function showResults() {
   if (hasInvisible) {
     html += '<div class="char-section"><div class="section-title">Gefundene unsichtbare Zeichen:</div><div class="char-list">';
     for (let c in foundInvisible) {
-      html += `<div class="char-item"><input type='checkbox' class='charCheck' value='${c}' checked><span>${invisibleChars[c].name}</span><span class="char-code">U+${c.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0')}</span><span class="char-count">${foundInvisible[c]}x</span></div>`;
+      html += `<div class="char-item"><input type='checkbox' class='charCheck' value='${c}' checked><span>${invisibleChars[c].name}</span><span class="char-code">U+${c.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}</span><span class="char-count">${foundInvisible[c]}x</span></div>`;
     }
     html += '</div></div>';
   }
