@@ -309,14 +309,14 @@ function processText() {
     if (chk.checked) {
       const char = chk.value;
       if (invisibleChars[char]) {
-        let count = (cleaned.match(new RegExp(char, 'g')) || []).length;
+        let count = (cleaned.match(new RegExp(char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
         rc += count;
-        cleaned = cleaned.replace(new RegExp(char, 'g'), '');
+        cleaned = cleaned.replace(new RegExp(char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '');
       }
       if (aiTypicalChars[char]) {
-        let count = (cleaned.match(new RegExp(char, 'g')) || []).length;
+        let count = (cleaned.match(new RegExp(char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
         nc += count;
-        cleaned = cleaned.replace(new RegExp(char, 'g'), aiTypicalChars[char].replace);
+        cleaned = cleaned.replace(new RegExp(char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), aiTypicalChars[char].replace);
       }
     }
   });
